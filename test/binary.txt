@@ -1,0 +1,29 @@
+# Single-file small change
+
+diff --git a/tree-sitter-gitdiff.wasm b/tree-sitter-gitdiff.wasm
+index 0e9e828..3e32290 100755
+Binary files a/tree-sitter-gitdiff.wasm and b/tree-sitter-gitdiff.wasm differ
+
+==>
+
+Source(
+    Command(Filename,Filename),
+    Index(Commit,Commit,Mode),
+    BinaryChange(Filename,Filename)
+)
+
+# Deleted binary file
+
+diff --git a/docs/playground.png b/docs/playground.png
+deleted file mode 100644
+index 9cf2a44..0000000
+Binary files a/docs/playground.png and /dev/null differ
+
+==>
+
+Source(
+    Command(Filename,Filename),
+    FileChange(FileDeleted(Mode)),
+    Index(Commit,Commit),
+    BinaryChange(Filename,Filename)
+)

@@ -1,0 +1,124 @@
+@top Source {
+  (line? newline)* line?
+}
+
+line {
+  Command |
+  Index |
+  BinaryChange |
+  FileChange |
+  NewFile |
+  OldFile |
+  Location |
+  Context |
+  Addition |
+  Deletion |
+  Similarity |
+  noNewLineAtTheEndOfNewFile
+}
+
+Similarity {
+    similarity " " "index" " " digit digit? digit? "%"
+}
+
+Addition {
+    (plus (anything? " ")* anything?) |
+    (plus plus (anything? " ")* anything?) |
+    (plus plus plus)
+    (plus plus plus plus (anything? " ")* anything?)
+}
+
+Deletion {
+    (minus (anything? " ")* anything?) |
+    (minus minus (anything? " ")* anything?) |
+    (minus minus minus)
+    (minus minus minus minus (anything? " ")* anything*)
+}
+
+Location { location " " Linerange " " Linerange " " "@@" (" " Context)? }
+
+Context { (anything? " ")+ anything? }
+
+Linerange { ("-" | "+") digit+ ("," digit+)? }
+
+NewFile { plus plus plus " " Filename }
+
+OldFile { minus minus minus " " Filename }
+
+Command {
+    diff " " "--git" " " Filename " " Filename
+}
+
+Index {
+    index " " Commit ".." Commit  (" " Mode)?
+}
+
+Commit { 
+    hex hex hex hex hex hex hex |
+    hex hex hex hex hex hex hex hex hex hex hex hex hex hex hex hex hex hex hex hex hex hex hex hex hex hex hex hex hex hex hex hex hex hex hex hex hex hex hex hex 
+}
+
+BinaryChange {
+    binary " " "files" " " Filename " " "and" " " Filename " " "differ"
+}
+
+FileChange { 
+    FileRenamedFrom |
+    FileRenamedTo |
+    FileNew |
+    FileDeleted
+}
+FileRenamedFrom { rename " " "from" " " Filename }
+FileRenamedTo { rename " " "to" " " Filename }
+FileDeleted { deleted " " "file" " " "mode" " " Mode }
+FileNew { new " " "file" " " "mode" " " Mode }
+
+Mode { digit digit digit digit digit digit }
+
+Filename {
+    fileA | fileB | devNull | relativeFilename
+}
+relativeFilename { anything ("/" anything )* }
+fileA { a relativeFilename }
+fileB { b relativeFilename }
+
+@tokens {
+    diff { "diff" }
+    index { "index" }
+    location { "@@" }
+    binary { "Binary" }
+    deleted { "deleted" }
+    new { "new" }
+    rename {"rename"}
+    plus { "+" }
+    minus { "-" }
+    similarity { "similarity" }
+    a { "a/" }
+    b { "b/" }
+    devNull { "/dev/null" }
+    noNewLineAtTheEndOfNewFile { "\\ No newline at end of file" }
+
+    hex { $[a-f0-9] }
+    newline { "\r"? "\n" }
+    anything { ![ \r\n]+ }
+    digit { @digit }
+
+    @precedence { 
+        diff,
+        index,
+        location,
+        binary,
+        deleted,
+        new,
+        rename,
+        plus,
+        minus,
+        similarity,
+        a,
+        b,
+        devNull,
+        noNewLineAtTheEndOfNewFile,
+        anything
+    }
+}
+

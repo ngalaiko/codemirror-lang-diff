@@ -1,0 +1,178 @@
+# Single-file small change
+
+diff --git a/grammar.js b/grammar.js
+index dc36969..f37fde0 100644
+--- a/grammar.js
++++ b/grammar.js
+@@ -6,6 +6,8 @@ module.exports = grammar({
+   extras: ($) => [],
+ 
+   rules: {
+-    source: ($) => "hello",
++    source: ($) => repeat($._line),
++
++    _line: ($) => choice(),
+   },
+ });
+
+==>
+
+Source(
+    Command(Filename,Filename),
+    Index(Commit,Commit,Mode),
+    OldFile(Filename),
+    NewFile(Filename),
+    Location(Linerange,Linerange,Context),
+    Context,
+    Context,
+    Context,
+    Deletion,
+    Addition,
+    Addition,
+    Addition,
+    Context,
+    Context
+)
+
+# New empty file
+
+diff --git a/tmp.txt b/tmp.txt
+new file mode 100644
+index 0000000..e69de29
+
+==>
+
+Source(
+    Command(Filename,Filename),
+    FileChange(FileNew(Mode)),
+    Index(Commit,Commit)
+)
+
+# Deleted empty file
+
+diff --git a/tmp.txt b/tmp.txt
+deleted file mode 100644
+index e69de29..0000000
+
+==>
+
+Source(
+    Command(Filename,Filename),
+    FileChange(FileDeleted(Mode)),
+    Index(Commit,Commit)
+)
+
+# File rename
+
+diff --git a/tmp.txt b/tmp.md
+similarity index 100%
+rename from tmp.txt
+rename to tmp.md
+
+==> 
+
+Source(
+    Command(Filename,Filename),
+    Similarity,
+    FileChange(FileRenamedFrom(Filename)),
+    FileChange(FileRenamedTo(Filename)),
+)
+
+# Location with no context
+
+@@ -0,0 +1 @@
+
+==>
+
+Source(
+    Location(Linerange,Linerange)
+)
+
+# No newline at end of file
+
+index 0000000..ee9808d
+--- /dev/null
++++ b/tmp.txt
+@@ -0,0 +1 @@
++aaa
+\ No newline at end of file
+
+==>
+
+Source(
+    Index(Commit,Commit),
+    OldFile(Filename),
+    NewFile(Filename),
+    Location(Linerange,Linerange),
+    Addition
+)
+
+# Just a file declaration and no newline
+
+--- /dev/null
+
+==>
+
+Source(OldFile(Filename))
+
+# location tokens in diff
+
+diff --git a/runtime/queries/elixir/highlights.scm b/runtime/queries/elixir/highlights.scm
+index 76fd2af..308ff34 100644
+--- a/runtime/queries/elixir/highlights.scm
++++ b/runtime/queries/elixir/highlights.scm
+@@ -125,7 +125,8 @@
+ (sigil
+   (sigil_name) @__name__
+   quoted_start: _ @string.special
+-  quoted_end: _ @string.special) @string.special
++  quoted_end: _ @string.special
++  (#not-eq? @__name__ "H")) @string.special
+ 
+ ; Calls
+ 
+diff --git a/runtime/queries/elixir/injections.scm b/runtime/queries/elixir/injections.scm
+index 321c90a..b4a5cba 100644
+--- a/runtime/queries/elixir/injections.scm
++++ b/runtime/queries/elixir/injections.scm
+@@ -1,2 +1,8 @@
+ ((comment) @injection.content
+  (#set! injection.language "comment"))
++
++((sigil
++  (sigil_name) @_sigil_name
++  (quoted_content) @injection.content)
++ (#eq? @_sigil_name "H")
++ (#set! injection.language "heex"))
+
+==>
+
+Source(
+    Command(Filename,Filename),
+    Index(Commit,Commit,Mode),
+    OldFile(Filename),
+    NewFile(Filename),
+    Location(Linerange,Linerange),
+    Context,
+    Context,
+    Context,
+    Deletion,
+    Addition,
+    Addition,
+    Context,
+    Context,
+    Context,
+    Command(Filename,Filename),
+    Index(Commit,Commit,Mode),
+    OldFile(Filename),
+    NewFile(Filename),
+    Location(Linerange,Linerange),
+    Context,
+    Context,
+    Addition,
+    Addition,
+    Addition,
+    Addition,
+    Addition,
+    Addition
+)
