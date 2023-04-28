@@ -1,10 +1,14 @@
 {
   "name": "codemirror-lang-diff",
-  "version": "0.1.0",
-  "description": "diff language support for CodeMirror",
+  "version": "1.0.0",
+  "description": "diff language support for CodeMirror6",
   "scripts": {
     "test": "mocha test/test.js",
     "prepare": "rollup -c"
+  },
+  "author": {
+    "name": "Nikita Galaiko",
+    "email": "nikita@galaiko.rocks"
   },
   "type": "module",
   "main": "dist/index.cjs",
@@ -15,7 +19,7 @@
   },
   "types": "dist/index.d.ts",
   "sideEffects": false,
-  "dependencies": {
+  "peerDependencies": {
     "@codemirror/language": "^6.0.0",
     "@lezer/highlight": "^1.0.0",
     "@lezer/lr": "^1.0.0"
