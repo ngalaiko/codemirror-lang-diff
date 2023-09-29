@@ -21,7 +21,6 @@ Similarity {
     similarity " " "index" " " digit digit? digit? "%"
 }
 
-Addition {
     (plus (anything? " ")* anything?) |
     (plus plus (anything? " ")* anything?) |
     (plus plus plus)
@@ -80,7 +79,6 @@ Filename {
 }
 relativeFilename { anything ("/" anything )* }
 fileA { a relativeFilename }
-fileB { b relativeFilename }
 
 @tokens {
     diff { "diff" }
